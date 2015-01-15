@@ -13,6 +13,7 @@
 struct termios config;
 
 volatile uint8_t running = 1;
+uint32_t samples[360] = {0xFFFFFFFF};
 
 void setupSerialDevice(struct termios *cfg) {
   cfg->c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | 
@@ -41,6 +42,31 @@ void sigHandler(int signo) {
   }
 }
 
+void processLidarFrame(lidar_frame_t *frame) {
+  uint16_t degreeStart = (frame->index - 0xA0) * 4;
+  lidar_reading_t tmp;
+  for (uint8_t i = 0; i < 4; i++) {
+    tmp = frame->readings[i];
+    uint32_t *bucket = &(samples[degreeStart + i]);
+    if (tmp.invalidData) {
+      *bucket = 0xFFFFFFFF;
+    } else {
+      *bucket = tmp.distance_mm;
+    }
+  }
+
+  if (frame->index == 0xF9) {
+    printf("*****START*****\r\n");
+    for (uint16_t i = 0; i < 360; i++) {
+        printf("%4d ", samples[i]);
+        if (i % 20 == 19) {
+          printf("\r\n");
+        }
+    }
+    printf("*****END*****\r\n");
+  }
+}
+
 int main(int argc, const char *argv[]) {
   signal(SIGINT, sigHandler);
   
@@ -62,6 +88,8 @@ int main(int argc, const char *argv[]) {
   if (tcsetattr(fd, TCSANOW, &config) < 0) {
     printf("Failed to set attributes");
   }
+  
+  lidar_init((lidarFrameCallback_t)&processLidarFrame);
 
   printf("Device Configured\r\n");
   uint8_t readChar;

@@ -14,6 +14,7 @@ uint8_t frameBuf[22] = {0};
 uint8_t frameIdx = 0; 
 
 static lidarState_t state = lidarState_lookingForStart;
+static lidarFrameCallback_t frameCb = NULL;
 
 static uint16_t computeChecksum(uint16_t *buf) {
   uint32_t checksum = 0;
@@ -51,22 +52,9 @@ static lidarState_t lookingForStart(uint8_t b) {
 
 static void processFrame(uint8_t *buf) {
   lidar_frame_t *frame = (lidar_frame_t *)buf;
-  lidar_reading_t *temp;
-  if (frame->index == 0xA1){
-    for (uint8_t i = 0; i < 1; i++) {
-      temp = &(frame->readings[i]);
-      printf("Distance: %5d ", temp->distance_mm);
-      printf("Strength Warning: %1d ", temp->strengthWarning);
-      printf("Invalid Data: %1d ", temp->invalidData);
-      printf("Strength: %5d ", temp->strength);
-    }
-    printf("\r\n");
+  if (frameCb != NULL) {
+    frameCb(frame);
   }
-//  printf("Received Frame: ");
-//  for (uint8_t i = 0; i < FRAME_LENGTH; i++) {
-//    printf("%0.2X ", buf[i]);
-//  } 
-//  printf("\r\n");
 }
 
 static lidarState_t receiveFrames(uint8_t b) {
@@ -93,4 +81,8 @@ void lidar_processByte(uint8_t b) {
       state = receiveFrames(b);     
       break;
   }
+}
+
+void lidar_init(lidarFrameCallback_t cb) {
+  frameCb = cb;
 }
