@@ -2,7 +2,8 @@ PROJECT = lidarTest
 
 CPPSRCS = main.cpp \
        lidar.cpp \
-       uart.cpp
+       uart.cpp \
+       Motor.cpp
 
 INCS = 
 
