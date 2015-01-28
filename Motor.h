@@ -11,7 +11,7 @@ class Motor {
   public:
     //inputs are pin numbers
     Motor(uint8_t pwmPin, uint8_t dirPin);
-
+    ~Motor();
     // pwm value must be between 0 and 1
     // direction will go forward if >= 0, backward if < 0
     void setSpeed(float pwm, bool direction);

@@ -14,7 +14,7 @@
 volatile uint8_t running = 1;
 uint32_t samples[360] = {0xFFFFFFFF};
 void signal_handler(int signal) {
-  printf("Signal Caught!");
+  printf("Signal Caught!\r\n");
   running = 0;
 }
 
@@ -44,7 +44,7 @@ void processLidarFrame(lidar_frame_t *frame) {
 }
 
 int main(int argc, const char *argv[]) {
-  signal(SIGTERM, signal_handler);
+  signal(SIGINT, signal_handler);
   int32_t fd = uart_init();
 //  lidar_init((lidarFrameCallback_t)&processLidarFrame);
 
@@ -52,18 +52,27 @@ int main(int argc, const char *argv[]) {
 //  uint8_t readChar;
 
   Motor *leftMotor = new Motor(MOTOR_LEFT_PWM_PIN, MOTOR_LEFT_DIR_PIN);
-// if (leftMotor == NULL) {
-//    printf("Left Motor is Null!\r\n");
-//  } else {
-//    leftMotor->setSpeed(.5,0);
-//  }
+  Motor *rightMotor = new Motor(MOTOR_RIGHT_PWM_PIN, MOTOR_RIGHT_DIR_PIN);
+  if (leftMotor == NULL) {
+    printf("Left Motor is Null!\r\n");
+  } else {
+    leftMotor->setSpeed(.15,0);
+  }
+
+  if (rightMotor == NULL) {
+    printf("Right Motor is Null\r\n");
+  } else {
+    rightMotor->setSpeed(.15,0);
+  }
   while (running) {
 //    while (read(fd, &readChar, 1) > 0) {
-//      lidar_processByte(readChar);
+//    lidar_processByte(readChar);
 //    }
     usleep(10 * MS);
   }
-//  leftMotor->setSpeed(0,0);
+  leftMotor->setSpeed(0,0);
+  rightMotor->setSpeed(0,0);
   close(fd);
-//  free(leftMotor);
+  delete leftMotor;
+  delete rightMotor;
 }

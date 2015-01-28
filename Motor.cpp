@@ -13,6 +13,14 @@ Motor::Motor(uint8_t pwmPin, uint8_t dirPin) {
   dirp->dir(mraa::DIR_OUT); 
 }
 
+Motor::~Motor() {
+  pwmp->write(0);
+  pwmp->enable(false);
+  delete pwmp;
+
+  delete dirp;
+}
+
 void Motor::setSpeed(float pwm,bool direction) {
   pwmp->write(pwm);
   dirp->write(direction);
