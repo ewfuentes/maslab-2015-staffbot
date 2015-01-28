@@ -12,7 +12,7 @@ class Encoder {
     mraa::Gpio *phaseBp;
     pthread_t threadHandle;
 
-    volatile int64_t count;
+    volatile int32_t count;
     volatile uint8_t aState;
     volatile uint8_t bState;
     struct encoderISRArgs *isrArgsA;
@@ -22,7 +22,7 @@ class Encoder {
   public:
     Encoder(uint8_t phaseApin, uint8_t phaseBpin);
     ~Encoder();
-    int64_t getCount();
+    int32_t getCount();
     void edgeISR(mraa::Gpio *pin);
 };
 

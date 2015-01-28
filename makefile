@@ -17,7 +17,7 @@ OUTFILE = $(PROJECT)
 SRCPATHS = $(sort $(dir $(SRCS)))
 VPATH = $(SRCPATHS)
 
-CPPFLAGS = 
+CPPFLAGS = -ggdb
 LDFLAGS = -lmraa
 
 all : $(OBJS) $(OUTFILE)
